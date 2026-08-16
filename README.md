@@ -11,7 +11,9 @@
 ![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black)
 
 ---
+<img width="1024" height="603" alt="architecture" src="https://github.com/user-attachments/assets/5382954e-0e21-413b-94a5-0b95c30d5b54" />
 
+---
 ## 📌 Overview
 
 This project simulates a real-time banking data platform: a Postgres OLTP database (customers, accounts, transactions) is captured via **Change Data Capture (CDC)** using **Debezium + Kafka**, landed as Parquet in **MinIO** (S3-compatible object storage), and picked up by an **Airflow**-orchestrated job every minute to load into **Snowflake**. From there, **dbt** takes over: staging views deduplicate and type the raw JSON payloads, **SCD Type 2 snapshots** track full history on customers and accounts, and a **star schema** in the Marts layer serves the curated data to **Power BI**. The entire stack — Kafka, Zookeeper, Debezium Connect, Postgres (×2), MinIO, and three Airflow services — runs from a single `docker-compose.yml`.

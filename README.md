@@ -92,16 +92,6 @@ The curated Marts star schema is connected to **Power BI** (`Banking Dashboard.p
 **Scale note:** the dashboard's KPI cards report 100 customers / 200 accounts / 500 transactions, noticeably smaller than the ~56K/72K/96K rows observed directly in the source Postgres tables (Section 4 below) — consistent with the dashboard being built against an early or sampled snapshot of the data rather than the full accumulated volume from repeated generator runs. Worth refreshing the `.pbix` against current Marts data before using it as a live reporting artifact.
 
 
----
-
-## 🔒 Security Note
-
-This repository was audited for leaked credentials before publishing:
-- All `.env` files (root, `kafka-debezium/`, `consumer/`, `data-generator/`, `docker/dags/`) contain either local-only defaults (`postgres`/`postgres`, `minioadmin`/`minioadmin` — fine for a local Docker Compose stack, not for any shared/public deployment) or angle-bracket placeholders (`<user>`, `<access-key>`) — no real secrets.
-- Every Python script (`generate_and_post_connector.py`, `kafka_to_minio.py`, `faker_generator.py`, both Airflow DAGs) loads credentials via `os.getenv()` / `python-dotenv`, never hardcoded.
-- `docker-compose.yml` sources all credentials from `${VAR}` substitution — no inline secrets.
-- **`docker/banking_dbt/profiles.yml` is masked in its current form, but is not covered by `.gitignore`** (only `target/`, `dbt_packages/`, `logs/`, `.env` are excluded). This file also contains profiles for two *other* projects (`movies_sf_dbt`, `walmart_project` with a Databricks token) — it looks like a shared global `~/.dbt/profiles.yml` was copied into this repo. **Add `profiles.yml` to `.gitignore` and check `git log -p -- docker/banking_dbt/profiles.yml` for any historically-committed unmasked version before treating this repo as public.**
-- Minor hygiene note (not a leaked secret): the Airflow init command in `docker-compose.yml` creates the default admin user with a hardcoded `admin`/`admin` login — fine for local dev, call it out if this ever runs anywhere reachable.
 
 ---
 
